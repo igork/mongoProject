@@ -28,7 +28,10 @@ public class MappingPOJO {
 
     public static void main(String[] args) {
         Logger.getLogger("org.mongodb.driver").setLevel(Level.WARNING);
-        ConnectionString connectionString = new ConnectionString(System.getProperty("mongodb.uri"));
+        String conn = "mongodb+srv://user:user@cluster0-ddiwx.mongodb.net/test?retryWrites=true&w=majority";
+        System.out.println("mongodb: " + conn);
+        
+        ConnectionString connectionString = new ConnectionString(conn);
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
         CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
         MongoClientSettings clientSettings = MongoClientSettings.builder()
@@ -60,7 +63,7 @@ public class MappingPOJO {
             System.out.println("Grade replaced:\t" + updatedGrade);
 
             // delete this grade
-            System.out.println("Grade deleted:\t" + grades.deleteOne(filterByGradeId));
+            System.out.println("Grade deleted:\t" + grades.deleteMany(filterByGradeId));
         }
     }
 }
