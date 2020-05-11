@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class Recomm1 extends Recommendation{
 
-    protected List<Score> recommendation;
+    //protected List<Score> recommendation;
 
     public Recomm1 setRecommendation(List<Score> scores) {
         this.recommendation = scores;
@@ -16,7 +16,7 @@ public class Recomm1 extends Recommendation{
     }
     
     public List<Score> getRecommendation(){
-    	return this.recommendation;
+    	return (List<Score>)this.recommendation;
     }
     
     @Override

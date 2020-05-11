@@ -248,24 +248,29 @@ public class Connection {
         
             MongoDatabase sampleTrainingDB = mongoClient.getDatabase("test");
             MongoCollection<Document> gradesCollection = sampleTrainingDB.getCollection("test");
+            
+            test1(gradesCollection);
+            if (true)
+            	return;
 
             String testId1 = "001";
             String testId2 = "002";
             String testId3 = "003";
             String[] tests = {testId1,testId2,testId3};
             
-            System.out.println("\ntest for reading _id: " + testId1);
+            System.out.println("\ntest for reading");
             // find one document with new Document
             for(String test : tests) {
             	Document record = gradesCollection.find(new Document("_id", test)).first();
             	if (record!=null) {
-            		System.out.println("record: " + record.toJson());
+            		System.out.println("record _id: " + test + "\n" + record.toJson());
             	}
             }
                    
             /*
              * update 1
              */
+            /*
             MongoCollection<Recomm1> coll1 = sampleTrainingDB.getCollection("test",Recomm1.class);
             Recomm1 recomm1 = coll1.find(eq("object_id", testId1)).first();
             if (recomm1==null) {
@@ -279,25 +284,22 @@ public class Connection {
         	recomm1.setRecommendation("json-string");	
             
             System.out.println("Recomm1 :\t" + recomm1);
-           /*
-            System.out.println("\ntest for updating _id: " + testId1);
+            */
+            
             // update one document
+            System.out.println("\ntest for updating _id: " + testId1);
             Bson filter = eq("_id", testId1);
-            
-            Bson updateOperation = set("comment", "You should learn MongoDB! " + getTimestamp());
-            
-            //updateOperaton = push();
-            
+            Bson updateOperation = set("comment", "You should learn MongoDB!");
             UpdateResult updateResult = gradesCollection.updateOne(filter, updateOperation);
-            System.out.println("=> Updating the doc with " + filter.toString() + ". Adding comment."); //getJson(filter));
+            System.out.println("=> Updating the doc with " + filter + ". Adding comment.");
             System.out.println(gradesCollection.find(filter).first().toJson(prettyPrint));
             System.out.println(updateResult);
-
+           
             // upsert
-            filter = and(eq("_id", testId2), eq("class_id", 10d));
+            filter = and(eq("_id", testId1), eq("class_id", 10d));
             updateOperation = push("comments", "You will learn a lot if you read the MongoDB blog!");
             UpdateOptions options = new UpdateOptions().upsert(true);
-            
+          
             //E11000 duplicate key error collection: 5e3e36f7014b768935c738b8_test.test index: _id_ dup key: { _id: "008" }
             updateResult = gradesCollection.updateOne(filter, updateOperation, options);
             ////////////////////
@@ -305,14 +307,8 @@ public class Connection {
             System.out.println(updateResult);
             System.out.println(gradesCollection.find(filter).first().toJson(prettyPrint));
 
-            // update many documents
-            filter = gte("_id", testId);
-            updateResult = gradesCollection.updateMany(filter, updateOperation);
-            System.out.println("\n=> Updating all the documents with " + filter.toString() + ".");
-            System.out.println(updateResult);
-
             // findOneAndUpdate
-            filter = eq("_id", testId);
+            filter = eq("_id", testId1);
             Bson update1 = inc("x", 10); // increment x by 10. As x doesn't exist yet, x=10.
             Bson update2 = rename("class_id", "new_class_id"); // rename variable "class_id" in "new_class_id".
             Bson update3 = mul("scores.0.score", 2); // multiply the first score in the array by 2.
@@ -323,8 +319,6 @@ public class Connection {
             Document oldVersion = gradesCollection.findOneAndUpdate(filter, updates);
             System.out.println("\n=> FindOneAndUpdate operation. Printing the old version by default:");
             System.out.println(oldVersion.toJson(prettyPrint));
-
-    */
 
         
         
@@ -350,7 +344,7 @@ public class Connection {
     	
     	
         String testId = "007";
-        String testId2 = "008";
+        //String testId2 = "008";
         JsonWriterSettings prettyPrint = JsonWriterSettings.builder().indent(true).build();
 
         
@@ -415,16 +409,18 @@ public class Connection {
         System.out.println(updateResult);
 
         // upsert
-        filter = and(eq("_id", testId2), eq("class_id", 10d));
+        filter = and(eq("_id", testId), eq("class_id", 10d));
         updateOperation = push("comments", "You will learn a lot if you read the MongoDB blog!");
-        UpdateOptions options = new UpdateOptions().upsert(true);
+        UpdateOptions options = new UpdateOptions().upsert(false);
         
         //E11000 duplicate key error collection: 5e3e36f7014b768935c738b8_test.test index: _id_ dup key: { _id: "008" }
         updateResult = gradesCollection.updateOne(filter, updateOperation, options);
         ////////////////////
         System.out.println("\n=> Upsert document with " + filter.toString() + " because it doesn't exist yet.");
         System.out.println(updateResult);
-        System.out.println(gradesCollection.find(filter).first().toJson(prettyPrint));
+        if (gradesCollection.find(filter).first()!=null ) {
+        	System.out.println(gradesCollection.find(filter).first().toJson(prettyPrint));
+        }
 
         // update many documents
         filter = gte("_id", testId);
@@ -446,7 +442,7 @@ public class Connection {
         System.out.println(oldVersion.toJson(prettyPrint));
 
         // but I can also request the new version
-        filter = eq("_id", testId2);
+        filter = eq("_id", testId);
         FindOneAndUpdateOptions optionAfter = new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER);
         Document newVersion = gradesCollection.findOneAndUpdate(filter, updates, optionAfter);
         System.out.println("\n=> FindOneAndUpdate operation. But we can also ask for the new version of the doc:");

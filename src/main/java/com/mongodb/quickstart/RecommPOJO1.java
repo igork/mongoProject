@@ -94,26 +94,33 @@ public class RecommPOJO1 {
             if (recomm1==null) {
             	
             	//create
+            	/*
             	List<Score> list = singletonList(new Score().setType("homework").setScore(50d));
                 recomm1 = (Recomm1) new Recomm1().setRecommId(recommTest)
                         .setTimestamp(new Date().toString())   
                         .setRecommendation(list);
                 Recomm1s.insertOne(recomm1);
                 System.out.println("Recomm1 inserted.");
+                */
+                recomm1 = (Recomm1)new Recomm1().setRecommId(recommTest)
+                        .setTimestamp(new Date().toString())
+                		.setLast_modified(new Date().toString())
+                        .setRecommendation(new ArrayList<Score>());
+                System.out.println("Recomm1 created.");
                 
-            } else {
+            }
             	
                 // update this Recomm1: adding an exam Recomm1
-                List<Score> newScores = isAppend? new ArrayList<>(recomm1.getRecommendation()):new ArrayList<>();
+                List<Score> newScores = isAppend? recomm1.getRecommendation():new ArrayList<>();
                 newScores.add(new Score().setType("exam").setScore(42d));
                 recomm1.setRecommendation(newScores);
                 //Document filterByRecomm1Id = new Document("_id", recomm1.getId());
                 Document filterByRecomm1Id = new Document("recomm_id", recommTest);
-                FindOneAndReplaceOptions returnDocAfterReplace = new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER);
+                FindOneAndReplaceOptions returnDocAfterReplace = new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true);
                 Recomm1 updatedRecomm1 = Recomm1s.findOneAndReplace(filterByRecomm1Id, recomm1, returnDocAfterReplace);
                 System.out.println("Recomm1 replaced:\t" + updatedRecomm1);
             	
-            }
+            
             System.out.println("\nRecomm1 found:\t\t" + recomm1);
             if (recomm1.getRecommendation() instanceof List) {
             	System.out.println("Recomm1 size:\t\t" + recomm1.getRecommendation().size());
